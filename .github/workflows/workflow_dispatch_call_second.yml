@@ -7,38 +7,7 @@ on:
         description: 'subproject name'
         required: true
         type: string
-      environment:
-        description: 'deployment environment'
-        required: true
-        type: string
-        default: 'dev'
-  workflow_dispatch:
-    inputs:
-      subproject:
-        description: 'subproject name'
-        required: true
-        type: choice
-        options:
-        - aa
-        - bb
-        - cc
-      environment:
-        description: 'deployment environment'
-        required: true
-        default: 'dev'
-        type: choice
-        options:
-        - dev
-        - stag
-        - pro
-      dodeloyment:
-        description: 'Enable deployment step'
-        required: true
-        default: 'false'
-        type: choice
-        options:
-        - 'true'
-        - 'false'
+
 defaults:
   run:
     shell: bash
