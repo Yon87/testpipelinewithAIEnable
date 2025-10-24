@@ -1,0 +1,114 @@
+name: workflow_dispatch and workflow_call second
+
+on:
+  workflow_call:
+    inputs:
+      subproject:
+        description: 'subproject name'
+        required: true
+        type: string
+      environment:
+        description: 'deployment environment'
+        required: true
+        type: string
+        default: 'dev'
+  workflow_dispatch:
+    inputs:
+      subproject:
+        description: 'subproject name'
+        required: true
+        type: choice
+        options:
+        - aa
+        - bb
+        - cc
+      environment:
+        description: 'deployment environment'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+        - dev
+        - stag
+        - pro
+      dodeloyment:
+        description: 'Enable deployment step'
+        required: true
+        default: 'false'
+        type: choice
+        options:
+        - 'true'
+        - 'false'
+defaults:
+  run:
+    shell: bash
+
+
+jobs:
+  prebuild:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    container:
+      image: ubuntu:22.04
+    steps:
+    ##dummy message start from here
+    - name: Print GitHub Context
+      run: echo "${{ toJSON(github) }}"
+
+    - name: Print Env Context
+      # Note: The env context here refers to the env block defined in the workflow, not runtime environment variables.
+      # For runtime environment variables, use the 'env' command above.
+      run: echo "${{ toJSON(env) }}"
+
+    - name: Print Job Context
+      run: echo "${{ toJSON(job) }}"
+
+    - name: Print Steps Context (requires previous steps to have run)
+      # The 'steps' context can only access outputs of steps that have already completed in the current job.
+      id: dummy_step
+      run: echo "This is a dummy step output"
+      # You can print the steps context in the next step.
+    - name: Print Steps Context (after dummy_step)
+      run: echo "${{ toJSON(steps) }}"
+
+    - name: Print Runner Context
+      run: echo "${{ toJSON(runner) }}"
+
+    - name: Print Secrets Context
+      run: echo "${{ toJSON(secrets) }}"
+      env:
+        MY_SECRET: ${{ secrets.WORKFLOW_PAT }}
+    - name: Print Strategy Context (if using matrix or concurrency)
+      run: echo "${{ toJSON(strategy) }}"
+    ##dummy message until here
+    - name: Print Input Values and Actor
+      run: |
+        echo "Subproject: ${{ inputs.subproject }}"
+        echo "Environment: ${{ inputs.environment }}"
+        echo "App Branch: ${{ inputs.app_branch }}"
+        echo "Triggered by: ${{ github.actor }}"
+        echo "Event: ${{ github.event_name }}"
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        clean: true
+    - name: Configure Git Safe Directory
+      run: git config --global --add safe.directory "$(pwd)"
+  build:
+    needs: prebuild
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    container:
+      image: ubuntu:22.04
+    steps:
+    - name: Print Input Values and
+      run: |
+        echo "Subproject: ${{ inputs.subproject }}"
+        echo "Environment: ${{ inputs.environment }}"
+        echo "App Branch: ${{ inputs.app_branch }}"
+        echo "Triggered by: ${{ github.actor }}"
+        echo "Event: ${{ github.event_name }}"
+    - name: Checkout code by workflow_dispatch
+      uses: actions/checkout@v4
+      with:
+        clean: true
