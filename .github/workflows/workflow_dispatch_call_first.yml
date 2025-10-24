@@ -125,7 +125,6 @@ jobs:
 
   call-second-dispatch:
     needs: build
-    if: ${{ always() && contains(fromJson('["cms-api-service","public-api-service","batch-biz-job","report-biz-job"]'), inputs.subproject)  && inputs.dodeloyment == 'true'  && needs.build.result == 'success' }}
     uses: ./.github/workflows/workflow_dispatch_call_second.yml
     secrets: inherit
     with:
