@@ -7,6 +7,11 @@ on:
         description: 'subproject name'
         required: true
         type: string
+      environment:
+        description: 'deployment environment'
+        required: true
+        type: string
+        default: 'dev'
 
 defaults:
   run:
